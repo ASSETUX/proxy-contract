@@ -1,0 +1,29 @@
+{
+  "name": "contract",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "npx hardhat run --network polygonMumbai ./scripts/deploy.ts",
+    "verify": "npx hardhat verify --network polygonMumbai --contract contracts/Transfer.sol:Transfer 0x79C1f49f232e137DC1434E690b7B3F50df4a94c6"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@openzeppelin/contracts": "^4.8.0",
+    "hardhat": "^2.12.4",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "@nomiclabs/hardhat-etherscan": "^3.1.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/hardhat": "^6.1.5",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "types/mocha",
+    "@types/node": "^18.11.18",
+    "chai": "^4.3.7",
+    "ethers": "^5.7.2",
+    "hardhat-gas-reporter": "^1.0.9",
+    "typechain": "^8.1.1"
+  }
+}
