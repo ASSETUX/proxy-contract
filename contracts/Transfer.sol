@@ -4,12 +4,8 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract Transfer {
+contract Owner {
     address private owner;
-
-    address[] whiteList;
-
-    event ProxyDeposit(address token, address from, address to, uint256 amount);
 
     constructor() {
         owner = msg.sender;
@@ -17,25 +13,6 @@ contract Transfer {
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not owner");
-        _;
-    }
-
-    function checkOfWhiteList(address adr) private view returns (bool) {
-        for (uint256 index = 0; index < whiteList.length; index++) {
-            if (adr == whiteList[index]) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function addWhiteList(address adr) external onlyOwner {
-        whiteList.push(adr);
-    }
-
-    modifier checkOfWhiteLists(address adr) {
-        require(checkOfWhiteList(adr), "Not WhiteList");
         _;
     }
 
@@ -47,8 +24,41 @@ contract Transfer {
         owner = wallet;
         return owner;
     }
+}
 
-    function proxyTokenWithoutOwner(
+contract WhiteList is Owner {
+    mapping(address => uint16) whiteList;
+
+    modifier checkOfWhiteLists(address adr) {
+        require(checkOfWhiteList(adr) == 0, "Not WhiteList");
+        _;
+    }
+
+    function checkOfWhiteList(address adr) private view returns (uint16) {
+        if (whiteList[adr] > 0) {
+            return whiteList[adr];
+        }
+
+        return 0;
+    }
+
+    function deleteFromWhiteList(address adr)
+        public
+        checkOfWhiteLists(adr)
+        onlyOwner
+    {
+        delete whiteList[adr];
+    }
+
+    function addWhiteList(address adr) external onlyOwner {
+        whiteList[adr] = 1;
+    }
+}
+
+contract Transfer is Owner, WhiteList {
+    event ProxyDeposit(address token, address from, address to, uint256 amount);
+
+    function proxyToken(
         address token,
         address to,
         uint256 amount
