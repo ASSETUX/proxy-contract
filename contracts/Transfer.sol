@@ -20,30 +20,25 @@ contract Owner {
         return owner;
     }
 
-    function setOwner(address wallet) external onlyOwner returns (address) {
+    function setOwner(address wallet) external onlyOwner{
         owner = wallet;
-        return owner;
     }
 }
 
 contract WhiteList is Owner {
-    mapping(address => uint16) whiteList;
-
+    mapping(address => bool) whiteList;
+    
     modifier checkOfWhiteLists(address adr) {
-        require(checkOfWhiteList(adr) == 0, "Not WhiteList");
+        require(checkOfWhiteList(adr), "Not WhiteList");
         _;
     }
 
-    function checkOfWhiteList(address adr) private view returns (uint16) {
-        if (whiteList[adr] > 0) {
-            return whiteList[adr];
-        }
-
-        return 0;
+    function checkOfWhiteList(address adr) private view returns (bool) {
+        return whiteList[adr];
     }
 
     function deleteFromWhiteList(address adr)
-        public
+        external
         checkOfWhiteLists(adr)
         onlyOwner
     {
@@ -51,7 +46,7 @@ contract WhiteList is Owner {
     }
 
     function addWhiteList(address adr) external onlyOwner {
-        whiteList[adr] = 1;
+        whiteList[adr] = true;
     }
 }
 
@@ -62,7 +57,7 @@ contract Transfer is Owner, WhiteList {
         address token,
         address to,
         uint256 amount
-    ) public payable checkOfWhiteLists(to) {
+    ) external payable checkOfWhiteLists(to) {
         IERC20(token).transferFrom(msg.sender, to, amount);
 
         emit ProxyDeposit(token, msg.sender, to, amount);
